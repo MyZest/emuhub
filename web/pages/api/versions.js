@@ -15,7 +15,7 @@ function readApisFromAndroidDocker() {
         .filter((d) => d.isDirectory())
         .map((d) => d.name)
         .map((name) => {
-          const m = name.match(/^android(\d+)$/)
+          const m = name.match(/^android[-_]?(\d+)$/)
           return m ? parseInt(m[1], 10) : null
         })
         .filter((n) => typeof n === 'number')
