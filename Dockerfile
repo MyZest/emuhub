@@ -44,8 +44,9 @@ COPY android-docker/common/tools /opt/tools
 COPY android-docker/android34/tools /opt/tools
 COPY android-docker/android34/licenses /opt/licenses
 COPY android-docker/common/spoof /opt/spoof
-COPY web /opt/app
-COPY user-configuration /opt/app/user-configuration
+RUN mkdir -p /opt/android-docker
+COPY android-docker/android*/ /opt/android-docker/
+COPY web/package*.json /opt/app/
 RUN find /opt/tools -type f -name "*.sh" -exec chmod +x {} \;
 
 WORKDIR /opt/android-sdk-linux
@@ -62,11 +63,15 @@ RUN python3 /opt/spoof/gen_profiles.py
 RUN mkdir -p /data/spoof/profiles
 WORKDIR /opt/app
 ARG NPM_REGISTRY=
-RUN --mount=type=cache,target=/root/.npm \
+ARG USE_NPM_CI=false
+RUN --mount=type=cache,target=/root/.npm --mount=type=cache,target=/opt/app/node_modules \
     set -eux; \
     if [ -n "${NPM_REGISTRY}" ]; then npm config set registry "${NPM_REGISTRY}"; fi; \
-    (npm ci || npm install); \
+    if [ "${USE_NPM_CI}" = "true" ]; then npm ci; else npm install; fi; \
     npm run build
+
+COPY web /opt/app
+COPY user-configuration /opt/app/user-configuration
 
 EXPOSE 6080 5901 5555
 WORKDIR /opt/android-sdk-linux

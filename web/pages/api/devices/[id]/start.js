@@ -12,25 +12,23 @@ export default async function handler(req, res) {
   function readApisFromAndroidDocker() {
     const baseCandidates = [
       process.env.ANDROID_DOCKER_DIR,
+      '/opt/android-docker',
       path.join(process.cwd(), 'android-docker'),
       '/opt/app/android-docker',
     ].filter(Boolean)
+    const set = new Set()
     for (const base of baseCandidates) {
       try {
         if (!fs.existsSync(base)) continue
         const entries = fs.readdirSync(base, { withFileTypes: true })
-        const list = entries
-          .filter((d) => d.isDirectory())
-          .map((d) => d.name)
-          .map((name) => {
-            const m = name.match(/^android(\d+)$/)
-            return m ? parseInt(m[1], 10) : null
-          })
-          .filter((n) => typeof n === 'number')
-        if (list.length) return list.sort((a, b) => a - b)
+        for (const d of entries) {
+          if (!d.isDirectory()) continue
+          const m = d.name.match(/^android[-_]?(\d+)$/)
+          if (m) set.add(parseInt(m[1], 10))
+        }
       } catch {}
     }
-    return []
+    return Array.from(set).sort((a, b) => a - b)
   }
   function readApisFromSystemImages() {
     const base = '/opt/android-sdk-linux/system-images'
