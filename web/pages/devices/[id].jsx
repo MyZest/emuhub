@@ -42,71 +42,50 @@ export default function Device() {
   }
 
   return (
-    <main style={{ fontFamily: 'sans-serif', padding: 20 }}>
+    <main className="main">
       <h3>Start Device {id}</h3>
-      <label>
-        Android API
-        <select value={api} onChange={(e) => setApi(e.target.value)}>
-          {versions.map((v) => (
-            <option key={v.api} value={String(v.api)}>
-              {v.api} {v.installed ? '(installed)' : '(download)'}
-            </option>
-          ))}
-        </select>
-      </label>
-      <br />
-      <div style={{ margin: '8px 0' }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-            gap: 12,
-          }}
-        >
+      <div className="controls">
+        <label>
+          Android API
+          <select className="select" value={api} onChange={(e) => setApi(e.target.value)}>
+            {versions.map((v) => (
+              <option key={v.api} value={String(v.api)}>
+                {v.api} {v.installed ? '(installed)' : '(download)'}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div>
+        <div className="grid">
           {profiles.map((p) => (
             <button
               key={p.name}
               onClick={() => setProfile(p.name)}
-              style={{
-                border: profile === p.name ? '2px solid #0070f3' : '1px solid #ccc',
-                borderRadius: 8,
-                padding: 8,
-                textAlign: 'center',
-                background: '#fff',
-                cursor: 'pointer',
-              }}
+              className={`profile-btn ${profile === p.name ? 'active' : ''}`}
             >
-              <div
-                style={{
-                  height: 64,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
+              <div className="img-wrap">
                 {p.hasLogo ? (
-                  <img
-                    src={`/api/profile-logo/${p.name}`}
-                    alt={p.name}
-                    style={{ maxHeight: 64, maxWidth: 120 }}
-                  />
+                  <img className="profile-img" src={`/api/profile-logo/${p.name}`} alt={p.name} />
                 ) : (
-                  <span style={{ fontSize: 12, color: '#888' }}>No Logo</span>
+                  <span className="muted">No Logo</span>
                 )}
               </div>
-              <div style={{ marginTop: 6, fontSize: 12 }}>{p.name}</div>
+              <div className="muted" style={{ marginTop: 6 }}>{p.name}</div>
             </button>
           ))}
         </div>
       </div>
-      <br />
-      <label>
-        VNC Password
-        <input value={vnc} onChange={(e) => setVnc(e.target.value)} />
-      </label>
-      <br />
-      <button onClick={start}>Start</button>
-      <div style={{ marginTop: 12 }}>{status}</div>
+      <div className="controls" style={{ marginTop: 12 }}>
+        <label>
+          VNC Password
+          <input className="input" value={vnc} onChange={(e) => setVnc(e.target.value)} />
+        </label>
+      </div>
+      <div className="row" style={{ marginTop: 8 }}>
+        <button className="primary" onClick={start}>Start</button>
+        <div className="muted" style={{ alignSelf: 'center' }}>{status}</div>
+      </div>
     </main>
   )
 }

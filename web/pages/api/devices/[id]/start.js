@@ -73,13 +73,22 @@ export default async function handler(req, res) {
 
   // execa tagged template for clearer commands
   const { $ } = await import('execa')
-  const $$ = $({ stdio: 'inherit', shell: true })
-  const bg = $({ stdio: 'inherit', shell: true, detached: true })
 
-  // ensure system image (foreground)
-  await $('/opt/android-sdk-linux/bin/android-accept-licenses.sh', [
-    `sdkmanager ${sysImg(api)}`
-  ], { stdio: 'inherit' })
+  // run session setup via script
+  const proc = await $('/opt/tools/start-device-session.sh', [
+    String(did),
+    display,
+    String(vncPort),
+    String(wsPort),
+    vncPass,
+    profile,
+    String(api),
+  ])
+  let eff = { vnc: vncPort, ws: wsPort, api, profile }
+  try {
+    const out = String(proc.stdout || '').trim()
+    if (out) eff = { ...eff, ...JSON.parse(out) }
+  } catch {}
 
   const env = {
     ...process.env,
@@ -90,17 +99,7 @@ export default async function handler(req, res) {
     SYS_IMG: sysImg(api),
   }
 
-  // Xvfb (background)
-  bg`Xvfb ${display} -screen 0 1280x800x24`
-  // VNC password (foreground)
-  const passwdFile = `/tmp/vnc_pass_${did}`
-  await $$`bash -lc 'x11vnc -storepasswd "${vncPass}" ${passwdFile}'`
-  // x11vnc (background)
-  bg`x11vnc -display ${display} -forever -rfbport ${String(vncPort)} -shared -passwdfile ${passwdFile}`
-  // websockify (background)
-  bg`websockify ${String(wsPort)} localhost:${vncPort}`
-  // emulator (background)
-  await $('/opt/tools/run-emulator-with-profile.sh', { env, detached: true })
+  // emulator is started by the script; return response
 
-  res.status(200).json({ ok: true, device: { api, profile, vnc: vncPort, ws: wsPort } })
+  res.status(200).json({ ok: true, device: { api: eff.api, profile: eff.profile, vnc: eff.vnc, ws: eff.ws } })
 }

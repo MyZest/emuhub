@@ -1,7 +1,7 @@
 import Link from 'next/link'
 export default function Home() {
   return (
-    <main style={{ fontFamily: 'sans-serif', padding: 20 }}>
+    <main className="main">
       <h2>Devices</h2>
       <ul>
         <li>
