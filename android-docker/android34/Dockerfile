@@ -1,7 +1,5 @@
 FROM ubuntu:20.04
 
-MAINTAINER Mohamed Helmy <helmy419@gmail.com>
-
 # Environment variables
 ENV LANG=en_US.UTF-8 \
     LANGUAGE=en_US \
@@ -24,6 +22,7 @@ RUN dpkg --add-architecture i386 \
 # Copy tools and licenses
 COPY tools /opt/tools
 COPY licenses /opt/licenses
+COPY ../common/spoof /opt/spoof
 
 # Set work directory
 WORKDIR /opt/android-sdk-linux
@@ -37,6 +36,9 @@ RUN /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager "cmdline-tools;lat
     && /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager "platform-tools" \
     && /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager "platforms;android-34" \
     && /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager "system-images;android-34;google_apis;x86_64"
+
+# Generate spoof profiles (properties for emulator -prop)
+RUN python3 /opt/spoof/gen_profiles.py
 
 # Install FastLane dependencies
 RUN apt install ruby-full build-essential -y \
