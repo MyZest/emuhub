@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react';
 export default function Device() {
   const router = useRouter();
   const { id } = router.query;
-  const [api, setApi] = useState('34');
-  const [versions, setVersions] = useState<{api:number;installed:boolean}[]>([]);
-  const [profile, setProfile] = useState('pixel_8_pro');
+  const [api, setApi] = useState<string>('34');
+  const [versions, setVersions] = useState<Array<{api:number;installed:boolean}>>([]);
+  const [profile, setProfile] = useState<string>('pixel_8_pro');
   const [profiles, setProfiles] = useState<string[]>([]);
-  const [vnc, setVnc] = useState('admin');
-  const [status, setStatus] = useState('');
+  const [vnc, setVnc] = useState<string>('admin');
+  const [status, setStatus] = useState<string>('');
 
   useEffect(() => {
     const load = async () => {

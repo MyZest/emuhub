@@ -11,8 +11,13 @@ function isInstalled(api: number) {
   }
 }
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const list = [30,32,34].map(api => ({ api, installed: isInstalled(api) }))
+type VersionsResponse = { versions: { api: number; installed: boolean }[] }
+
+export default function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<VersionsResponse>
+) {
+  const list: { api: number; installed: boolean }[] = [30,32,34].map(api => ({ api, installed: isInstalled(api) }))
   res.status(200).json({ versions: list })
 }
 /**

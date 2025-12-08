@@ -27,7 +27,15 @@ function validLine(line: string) {
   return allowed.some(p=>k.startsWith(p))
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+type ProfilesResponse = { profiles: string[] }
+type PostBody = { name?: string; content?: string }
+type ErrorResponse = { ok: false; error: string }
+type PostSuccess = { ok: true; name: string }
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<ProfilesResponse | PostSuccess | ErrorResponse>
+) {
   if (req.method === 'GET') {
     const builtins = listProps('/opt/spoof/profiles')
     const dynamics = listProps('/data/spoof/profiles')
@@ -35,8 +43,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({ profiles: Array.from(set) })
   }
   if (req.method === 'POST') {
-    const name = String(req.body?.name || '').trim()
-    const content = String(req.body?.content || '')
+    const body = req.body as PostBody
+    const name = String(body?.name || '').trim()
+    const content = String(body?.content || '')
     if (!name || !/^[a-zA-Z0-9_\-]+$/.test(name)) return res.status(400).json({ ok:false, error:'invalid name' })
     if (content.length > 16000) return res.status(400).json({ ok:false, error:'content too large' })
     const lines = content.split('\n').map(l=>l.trim()).filter(l=>l.length>0)
@@ -48,7 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     fs.writeFileSync(file, lines.join('\n') + '\n')
     return res.status(200).json({ ok:true, name })
   }
-  return res.status(405).json({ ok:false })
+  return res.status(405).json({ ok:false, error: 'method not allowed' })
 }
 /**
  * API: GET /api/profiles

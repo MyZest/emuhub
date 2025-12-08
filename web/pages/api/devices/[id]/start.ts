@@ -5,15 +5,23 @@ function sysImg(api: number) {
   return `system-images;android-${api};google_apis;x86_64`;
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+type StartBody = { api?: number; profile?: string; vnc_pass?: string }
+type StartOk = { ok: true; device: { api: number; profile: string; vnc: number; ws: number } }
+type ErrorResp = { ok: false; error: string }
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<StartOk | ErrorResp>
+) {
   const { id } = req.query;
   const did = parseInt(String(id), 10);
-  const api = parseInt(String(req.body?.api ?? 34), 10);
+  const body = req.body as StartBody
+  const api = parseInt(String(body?.api ?? 34), 10);
   const allowedApis = [30,32,34];
   if (!allowedApis.includes(api)) return res.status(400).json({ ok:false, error:'invalid api' });
-  const profile = String(req.body?.profile ?? process.env.SPOOF_PROFILE ?? 'pixel_8_pro');
+  const profile = String(body?.profile ?? process.env.SPOOF_PROFILE ?? 'pixel_8_pro');
   if (!/^[a-zA-Z0-9_\-]+$/.test(profile)) return res.status(400).json({ ok:false, error:'invalid profile' });
-  const vncPass = String(req.body?.vnc_pass ?? 'admin');
+  const vncPass = String(body?.vnc_pass ?? 'admin');
   if (vncPass.length < 1 || vncPass.length > 64) return res.status(400).json({ ok:false, error:'invalid vnc_pass length' });
 
   const display = `:${10 + did}`;
