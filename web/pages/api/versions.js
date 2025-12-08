@@ -10,7 +10,6 @@ function isInstalled(api) {
 }
 
 export default function handler(req, res) {
-  const list = [30,32,34].map(api => ({ api, installed: isInstalled(api) }))
+  const list = [30, 32, 34].map((api) => ({ api, installed: isInstalled(api) }))
   res.status(200).json({ versions: list })
 }
-

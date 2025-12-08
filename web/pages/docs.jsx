@@ -4,9 +4,8 @@ import 'swagger-ui-react/swagger-ui.css'
 
 export default function Docs() {
   return (
-    <main style={{height:'100vh'}}>
+    <main style={{ height: '100vh' }}>
       <SwaggerUI url="/api/swagger.json" />
     </main>
   )
 }
-

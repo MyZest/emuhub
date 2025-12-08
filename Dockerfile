@@ -12,6 +12,7 @@ ENV LANG=en_US.UTF-8 \
     ANDROID_SDK_ROOT=/opt/android-sdk-linux \
     ANDROID_SDK=/opt/android-sdk-linux
 ENV PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/cmdline-tools/tools/bin:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/build-tools/34.0.0:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/emulator:${ANDROID_HOME}/bin"
+ENV NEXT_TELEMETRY_DISABLED=1
 
 ARG UBUNTU_MIRROR=archive.ubuntu.com
 ARG UBUNTU_SECURITY_MIRROR=security.ubuntu.com
@@ -32,7 +33,7 @@ RUN --mount=type=cache,target=/var/cache/apt --mount=type=cache,target=/var/lib/
     apt-get -o Acquire::Retries=5 update -yqq; \
     apt-get install -y --no-install-recommends curl expect git openjdk-17-jdk wget unzip vim xvfb fluxbox x11vnc novnc python3-websockify --fix-missing; \
     if [ "${ENABLE_I386:-false}" = "true" ]; then apt-get install -y libc6:i386 libgcc1:i386 libncurses5:i386 libstdc++6:i386 zlib1g:i386 --fix-missing; fi; \
-    curl -fsSL --retry 5 --retry-delay 3 https://deb.nodesource.com/setup_18.x | bash -; \
+    curl -fsSL --retry 5 --retry-delay 3 https://deb.nodesource.com/setup_22.x | bash -; \
     apt-get install -y --no-install-recommends nodejs --fix-missing; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*; \
