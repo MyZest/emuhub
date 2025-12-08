@@ -71,11 +71,8 @@ export default async function handler(req, res) {
   const vncPort = 5900 + did
   const wsPort = 6080 + did
 
-  // execa tagged template for clearer commands
-  const { $ } = await import('execa')
-
-  // run session setup via script
-  const proc = await $('/opt/tools/start-device-session.sh', [
+  const { spawn } = await import('child_process')
+  const args = [
     String(did),
     display,
     String(vncPort),
@@ -83,12 +80,12 @@ export default async function handler(req, res) {
     vncPass,
     profile,
     String(api),
-  ])
-  let eff = { vnc: vncPort, ws: wsPort, api, profile }
-  try {
-    const out = String(proc.stdout || '').trim()
-    if (out) eff = { ...eff, ...JSON.parse(out) }
-  } catch {}
+  ]
+  const child = spawn('/opt/tools/start-device-session.sh', args, {
+    detached: true,
+    stdio: 'ignore',
+  })
+  try { child.unref() } catch {}
 
   const env = {
     ...process.env,
@@ -99,7 +96,5 @@ export default async function handler(req, res) {
     SYS_IMG: sysImg(api),
   }
 
-  // emulator is started by the script; return response
-
-  res.status(200).json({ ok: true, device: { api: eff.api, profile: eff.profile, vnc: eff.vnc, ws: eff.ws } })
+  res.status(200).json({ ok: true, device: { id: did, api, profile, vnc: vncPort, ws: wsPort, status: 'starting' } })
 }
