@@ -22,6 +22,32 @@ export API="$API"
 export AVD_NAME
 export SYS_IMG
 
+resolve_android_docker_dir() {
+  for d in "${ANDROID_DOCKER_DIR:-}" "/opt/android-docker" "/opt/app/android-docker" "$(pwd)/android-docker"; do
+    [ -n "$d" ] && [ -d "$d" ] && echo "$d" && return 0
+  done
+  echo ""
+}
+
+ANDROID_DOCKER_DIR="$(resolve_android_docker_dir)"
+if [ -n "$ANDROID_DOCKER_DIR" ]; then
+  VERSION_DIR="${ANDROID_DOCKER_DIR}/android${API}"
+  if [ -d "${VERSION_DIR}/tools" ]; then
+    mkdir -p "$TOOLS_DIR"
+    cp -a "${VERSION_DIR}/tools/." "$TOOLS_DIR/"
+  fi
+  if [ -d "${VERSION_DIR}/licenses" ]; then
+    mkdir -p /opt/licenses
+    cp -a "${VERSION_DIR}/licenses/." /opt/licenses/
+  fi
+  find "$TOOLS_DIR" -type f -name "*.sh" -exec chmod +x {} \; >/dev/null 2>&1 || true
+  chmod -R 0755 "$TOOLS_DIR" "/opt/licenses" >/dev/null 2>&1 || true
+  mkdir -p "/opt/android-sdk-linux/bin"
+  if [ -f "$TOOLS_DIR/android-env.sh" ]; then
+    cp -f "$TOOLS_DIR/android-env.sh" "/opt/android-sdk-linux/bin/android-env.sh"
+  fi
+fi
+
 if [ -f "/opt/android-sdk-linux/bin/android-env.sh" ]; then
   source "/opt/android-sdk-linux/bin/android-env.sh"
 fi
