@@ -27,16 +27,16 @@ fi
 cd ${ANDROID_HOME}
 echo "Set ANDROID_HOME to ${ANDROID_HOME}"
 
-if [ -f commandlinetools-linux.zip ]
+if [ -d "${ANDROID_HOME}/cmdline-tools/tools" ] || command -v sdkmanager >/dev/null 2>&1
 then
   echo "SDK Tools already bootstrapped. Skipping initial setup"
 else
   echo "Bootstrapping SDK-Tools"
   wget -q https://dl.google.com/android/repository/commandlinetools-linux-6609375_latest.zip -O commandlinetools-linux.zip
   unzip commandlinetools-linux.zip
-  mkdir cmdline-tools
+  mkdir -p cmdline-tools
   mv tools cmdline-tools/
-  rm commandlinetools-linux.zip
+  rm -f commandlinetools-linux.zip
 fi
 
 echo "Make sure repositories.cfg exists"

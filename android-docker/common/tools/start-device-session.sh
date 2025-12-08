@@ -11,6 +11,7 @@ PROFILE=${6:-pixel_8_pro}
 API=${7:-34}
 EMU_RES=${EMU_RES:-1280x800x24}
 WAIT_READY=${WAIT_READY:-false}
+TOOLS_DIR=${TOOLS_DIR:-/opt/tools}
 
 AVD_NAME="emu_${PROFILE}_api${API}_d${DID}"
 SYS_IMG="system-images;android-${API};google_apis;x86_64"
@@ -25,6 +26,10 @@ if [ -f "/opt/android-sdk-linux/bin/android-env.sh" ]; then
   source "/opt/android-sdk-linux/bin/android-env.sh"
 fi
 
+if [ -d "$TOOLS_DIR" ]; then
+  find "$TOOLS_DIR" -type f -name "*.sh" -exec chmod +x {} \; >/dev/null 2>&1 || true
+fi
+
 LOG_DIR="/var/log/emuhub/d${DID}"
 mkdir -p "$LOG_DIR"
 LOCK_FILE="/tmp/emu_session_${DID}.lock"
@@ -37,8 +42,8 @@ fi
 SYS_DIR="/opt/android-sdk-linux/system-images/android-${API}/google_apis/x86_64"
 SDK_BIN="/opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager"
 if [ ! -d "$SYS_DIR" ]; then
-  if command -v android-accept-licenses.sh >/dev/null 2>&1; then
-    android-accept-licenses.sh "sdkmanager ${SYS_IMG}" || true
+  if [ -x "${TOOLS_DIR}/android-accept-licenses.sh" ]; then
+    "${TOOLS_DIR}/android-accept-licenses.sh" "sdkmanager ${SYS_IMG}" || true
   else
     "$SDK_BIN" "${SYS_IMG}" || true
   fi
@@ -85,11 +90,11 @@ if ! pgrep -f "websockify .* ${WS_PORT} .*${VNC_PORT}" >/dev/null 2>&1; then
 fi
 
 if ! pgrep -f "emulator.*-avd ${AVD_NAME}" >/dev/null 2>&1; then
-  nohup /opt/tools/run-emulator-with-profile.sh >"${LOG_DIR}/emulator.log" 2>&1 &
+  nohup "${TOOLS_DIR}/run-emulator-with-profile.sh" >"${LOG_DIR}/emulator.log" 2>&1 &
 fi
 
 if [ "$WAIT_READY" = "true" ]; then
-  nohup /opt/tools/android-wait-for-emulator.sh >"${LOG_DIR}/emulator_ready.log" 2>&1 &
+  nohup "${TOOLS_DIR}/android-wait-for-emulator.sh" >"${LOG_DIR}/emulator_ready.log" 2>&1 &
 fi
 
 echo "{\"did\":${DID},\"display\":\"${DISPLAY}\",\"vnc\":${VNC_PORT},\"ws\":${WS_PORT},\"profile\":\"${PROFILE}\",\"api\":${API}}"
