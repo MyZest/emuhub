@@ -85,7 +85,9 @@ export default async function handler(req, res) {
     detached: true,
     stdio: 'ignore',
   })
-  try { child.unref() } catch {}
+  try {
+    child.unref()
+  } catch {}
 
   const env = {
     ...process.env,
@@ -96,5 +98,10 @@ export default async function handler(req, res) {
     SYS_IMG: sysImg(api),
   }
 
-  res.status(200).json({ ok: true, device: { id: did, api, profile, vnc: vncPort, ws: wsPort, status: 'starting' } })
+  res
+    .status(200)
+    .json({
+      ok: true,
+      device: { id: did, api, profile, vnc: vncPort, ws: wsPort, status: 'starting' },
+    })
 }

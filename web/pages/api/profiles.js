@@ -35,7 +35,10 @@ function hasLogo(name) {
     path.join(process.cwd(), 'user-configuration', 'images'),
     '/opt/app/user-configuration/images',
   ].filter(Boolean)
-  const norm = (s) => String(s).toLowerCase().replace(/[^a-z0-9_\-]/g, '')
+  const norm = (s) =>
+    String(s)
+      .toLowerCase()
+      .replace(/[^a-z0-9_\-]/g, '')
   const n = norm(name)
   const cands = [
     `/data/spoof/profiles/${name}.png`,
@@ -63,10 +66,13 @@ function hasLogo(name) {
     try {
       if (!fs.existsSync(root)) continue
       const files = fs.readdirSync(root)
-      if (files.some((f) => {
-        const base = norm(f)
-        return base.includes(n) || base.includes(`${n}_emu`)
-      })) return true
+      if (
+        files.some((f) => {
+          const base = norm(f)
+          return base.includes(n) || base.includes(`${n}_emu`)
+        })
+      )
+        return true
     } catch {}
   }
   return false

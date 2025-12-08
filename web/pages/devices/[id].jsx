@@ -78,16 +78,20 @@ export default function Device() {
               onChange={(e) => setFilter(e.target.value)}
               style={{ marginLeft: 12 }}
             />
-            <button className="" onClick={() => setLogs({})} style={{ marginLeft: 8 }}>Clear</button>
+            <button className="" onClick={() => setLogs({})} style={{ marginLeft: 8 }}>
+              Clear
+            </button>
           </div>
           <div style={{ marginTop: 12 }}>
             {Object.keys(logs).length === 0 ? (
               <div className="muted">No logs</div>
             ) : (
-              DEFAULT_ORDER.map((name) => (
+              DEFAULT_ORDER.map((name) =>
                 logs[name] ? (
                   <div key={name} style={{ marginBottom: 12 }}>
-                    <div className="muted" style={{ marginBottom: 4 }}>{name}.log</div>
+                    <div className="muted" style={{ marginBottom: 4 }}>
+                      {name}.log
+                    </div>
                     <pre className="code" style={{ maxHeight: 300, overflow: 'auto', padding: 8 }}>
                       {(logs[name] || [])
                         .filter((line) => !filter || String(line).includes(filter))
@@ -95,7 +99,7 @@ export default function Device() {
                     </pre>
                   </div>
                 ) : null
-              ))
+              )
             )}
           </div>
         </>
@@ -124,12 +128,18 @@ export default function Device() {
                 >
                   <div className="img-wrap">
                     {p.hasLogo ? (
-                      <img className="profile-img" src={`/api/profile-logo/${p.name}`} alt={p.name} />
+                      <img
+                        className="profile-img"
+                        src={`/api/profile-logo/${p.name}`}
+                        alt={p.name}
+                      />
                     ) : (
                       <span className="muted">No Logo</span>
                     )}
                   </div>
-                  <div className="muted" style={{ marginTop: 6 }}>{p.name}</div>
+                  <div className="muted" style={{ marginTop: 6 }}>
+                    {p.name}
+                  </div>
                 </button>
               ))}
             </div>
@@ -141,8 +151,12 @@ export default function Device() {
             </label>
           </div>
           <div className="row" style={{ marginTop: 8 }}>
-            <button className="primary" onClick={start}>Start</button>
-            <div className="muted" style={{ alignSelf: 'center' }}>{status}</div>
+            <button className="primary" onClick={start}>
+              Start
+            </button>
+            <div className="muted" style={{ alignSelf: 'center' }}>
+              {status}
+            </div>
           </div>
         </>
       )}

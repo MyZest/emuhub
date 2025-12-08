@@ -12,7 +12,10 @@ export default function handler(req, res) {
     path.join(process.cwd(), 'user-configuration', 'images'),
     '/opt/app/user-configuration/images',
   ].filter(Boolean)
-  const norm = (s) => String(s).toLowerCase().replace(/[^a-z0-9_\-]/g, '')
+  const norm = (s) =>
+    String(s)
+      .toLowerCase()
+      .replace(/[^a-z0-9_\-]/g, '')
   const nn = norm(n)
   const candidates = [
     `/data/spoof/profiles/${n}.png`,
@@ -44,7 +47,10 @@ export default function handler(req, res) {
           const base = norm(f)
           return base.includes(nn) || base.includes(`${nn}_emu`)
         })
-        if (hit) { fp = path.join(root, hit); break }
+        if (hit) {
+          fp = path.join(root, hit)
+          break
+        }
       } catch {}
     }
   }
