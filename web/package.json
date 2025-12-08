@@ -1,0 +1,16 @@
+{
+  "name": "emuhub-ui",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start -p 8080"
+  },
+  "dependencies": {
+    "next": "14.2.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "next-swagger-doc": "^0.3.2",
+    "swagger-ui-react": "^5.15.0"
+  }
+}

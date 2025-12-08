@@ -99,3 +99,10 @@ Thank you for using EmuHub!
 - Single-entry build: root `Dockerfile` builds the runnable image (no separate images required)
 - Resources: `android-docker/` holds SDK scripts, licenses and spoof profiles used by the root build
 - Runtime: Container starts noVNC + Emulator; spoof profiles are injected via `-prop` before AVD creation
+## Hot-plug Profiles
+- 挂载动态机型目录：
+  - `docker run ... -v $(pwd)/profiles:/data/spoof/profiles ...`
+- API：
+  - 列表：`GET /api/profiles`
+  - 上传：`POST /api/profiles`（JSON：`{ name, content }`）
+  - 删除：`DELETE /api/profiles/<name>`
