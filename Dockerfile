@@ -44,6 +44,7 @@ COPY android-docker/android34/tools /opt/tools
 COPY android-docker/android34/licenses /opt/licenses
 COPY android-docker/common/spoof /opt/spoof
 COPY web /opt/app
+RUN find /opt/tools -type f -name "*.sh" -exec chmod +x {} \;
 
 WORKDIR /opt/android-sdk-linux
 
