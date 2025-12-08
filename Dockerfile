@@ -86,7 +86,8 @@ COPY ./user-configuration/Desktop /home/emuhub/Desktop
 RUN /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager --update && \
     /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager --install "emulator" && \
     /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager --install "system-images;android-34;google-tv;x86" && \
-    /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager --install "system-images;android-33;android-wear;x86_64"
+    /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager --install "system-images;android-33;android-wear;x86_64" && \
+    /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager --install "system-images;android-34;google_apis;arm64-v8a"
 
 #     /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager --install "system-images;android-34;google_apis_playstore;x86_64" && \
 

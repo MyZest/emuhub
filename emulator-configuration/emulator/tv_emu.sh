@@ -9,7 +9,14 @@ DEVICE_NAME=$1
 DEVICE_ID=$2
 SKIN_NAME=$3
 SKIN_DIR="/opt/android-sdk-linux/skins"
-PACKAGE="system-images;android-34;google-tv;x86"
+ARCH=$(uname -m)
+if [ "$ARCH" = "x86_64" ]; then
+    PACKAGE="system-images;android-34;google-tv;x86"
+    GPU_FLAG="-gpu host"
+else
+    echo "当前为 ARM 主机，Android TV 暂无 arm64-v8a 官方系统镜像，建议在 x86_64 主机运行。" >&2
+    exit 1
+fi
 
 if /opt/android-sdk-linux/cmdline-tools/tools/bin/avdmanager list avd | grep -q $DEVICE_NAME; then
     echo "AVD ${DEVICE_NAME} already exists."
@@ -31,11 +38,10 @@ if screen -ls | grep -q "$DEVICE_NAME"; then
     screen -S "$DEVICE_NAME" -X quit
 fi
     screen -dmS "$DEVICE_NAME"
-    screen -S "$DEVICE_NAME" -X stuff "export QT_X11_NO_MITSHM=1 && /opt/android-sdk-linux/emulator/emulator -avd $DEVICE_NAME -gpu host -skindir $SKIN_DIR -skin $SKIN_NAME -delay-adb  ^M"
+    screen -S "$DEVICE_NAME" -X stuff "export QT_X11_NO_MITSHM=1 && /opt/android-sdk-linux/emulator/emulator -avd $DEVICE_NAME $GPU_FLAG -skindir $SKIN_DIR -skin $SKIN_NAME -delay-adb  ^M"
 
 if screen -ls | grep -q "${DEVICE_NAME}_apk_install"; then
     screen -S "${DEVICE_NAME}_apk_install" -X quit
 fi
     screen -dmS "${DEVICE_NAME}_apk_install"
     screen -S "${DEVICE_NAME}_apk_install" -X stuff "/opt/android-sdk-linux/platform-tools/adb wait-for-device shell 'while [[ -z \$(getprop sys.boot_completed) ]]; do sleep 1; done;' && /opt/android-sdk-linux/platform-tools/adb install /home/emuhub/apk/app-release.apk && exit"$(printf \\r)
-

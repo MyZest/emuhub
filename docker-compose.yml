@@ -2,6 +2,8 @@ services:
   emulator:
     build: .
     privileged: true
+    devices:
+      - /dev/kvm:/dev/kvm
     scale: 1
     environment:
       - VNCPASS=admin
@@ -16,5 +18,4 @@ services:
       options:
         max-size: 20m
         max-file: '10'
-
 

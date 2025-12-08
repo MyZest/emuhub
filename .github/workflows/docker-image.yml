@@ -36,3 +36,4 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: mohamedhelmy/emuhub:latest
+        platforms: linux/amd64,linux/arm64
