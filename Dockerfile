@@ -50,6 +50,8 @@ WORKDIR /opt/android-sdk-linux
 
 RUN /opt/tools/entrypoint.sh built-in
 
+RUN chmod +x /opt/android-sdk-linux/bin/android-accept-licenses.sh
+
 RUN /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager "cmdline-tools;latest" \
     && /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager "build-tools;34.0.0" \
     && /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager "platform-tools"

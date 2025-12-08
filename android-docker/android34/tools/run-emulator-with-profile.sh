@@ -10,7 +10,7 @@ if [ ! -f "$PROP_FILE" ]; then
 fi
 
 AVD_NAME=${AVD_NAME:-emu_${PROFILE}_api34}
-SYS_IMG="system-images;android-34;google_apis;x86_64"
+SYS_IMG="${SYS_IMG:-system-images;android-${API:-34};google_apis;x86_64}"
 
 source /opt/android-sdk-linux/bin/android-env.sh
 
@@ -29,6 +29,9 @@ done < "$PROP_FILE"
 
 EMULATOR_BIN="${ANDROID_HOME}/emulator/emulator"
 ARGS=( -avd "$AVD_NAME" -gpu swiftshader_indirect -no-accel -no-snapshot -no-boot-anim -verbose )
+SKIN_DIR="${EMULATOR_SKINS_DIR:-}"
+[ -z "$SKIN_DIR" ] || [ ! -d "$SKIN_DIR" ] && [ -d "/opt/app/emulator-configuration/skins" ] && SKIN_DIR="/opt/app/emulator-configuration/skins"
+[ -z "$SKIN_DIR" ] || [ ! -d "$SKIN_DIR" ] && [ -d "${ANDROID_HOME}/emulator/skins" ] && SKIN_DIR="${ANDROID_HOME}/emulator/skins"
+[ -n "$SKIN_DIR" ] && [ -d "$SKIN_DIR/$PROFILE" ] && ARGS+=( -skindir "$SKIN_DIR" -skin "$PROFILE" )
 
 exec "$EMULATOR_BIN" "${ARGS[@]}" "${PROP_ARGS[@]}"
-

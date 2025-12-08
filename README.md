@@ -111,3 +111,8 @@ Thank you for using EmuHub!
   - 动态：`/data/spoof/profiles/<name>.png|.svg`（运行容器时挂载 `-v $(pwd)/profiles:/data/spoof/profiles`）
   - 内置：`/opt/spoof/profiles/<name>.png|.svg`
 - 前端会自动在机型列表中显示对应 logo；无 logo 显示占位文本。
+
+
+
+docker build --platform linux/amd64 -t emuhub:0.1.1 .
+docker run --platform linux/amd64 -it --rm -p 8080:8080 -p 6080-6090:6080-6090 -p 5900-5910:5900-5910 -p 5555:5555 --name emuhub emuhub:0.1.1
