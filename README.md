@@ -20,7 +20,7 @@ EmuHub is an innovative tool designed to simplify the testing of Android applica
 - `docker pull mohamedhelmy/emuhub:latest`
 
 ## Getting Started
-To use EmuHub, follow these steps:
+单镜像构建与运行（内嵌 android-docker、noVNC 与机型伪装启动器）：
 
 1. **Clone the Repository**: Clone the EmuHub repository to your local machine.
 
@@ -30,30 +30,21 @@ To use EmuHub, follow these steps:
 
 2. **Build the Docker Image**
     ```bash
-    docker build -t emuhub .
+    docker build --platform linux/amd64 -t emuhub:0.1.0 .
     ```
 
-3. **Run EmuHub Container**: 
-  Start the EmuHub container.
-
+3. **Run EmuHub Container（noVNC + Emulator）**
     ```bash
-    docker run -d \
-    --name emulator \
-    --privileged \
-    -e VNCPASS=admin \
-    -e emuhubPASS=admin \
-    -e LISTENPORT=8000 \
-    -p 8000:8000 \
-    -v $(pwd)/apk-demo:/home/emuhub/apk \
-    --log-driver=json-file \
-    --log-opt max-size=20m \
-    --log-opt max-file=10 \
-    emuhub
+    docker run --platform linux/amd64 -it --rm \
+      -p 6080:6080 -p 5901:5901 -p 5555:5555 \
+      -e SPOOF_PROFILE=pixel_8_pro \
+      --name emuhub emuhub:0.1.0
     ```
     
-4. **Access Emulators**:
- 
-  Open your web browser and navigate to `http://localhost:8000` to access the EmuHub interface and start testing your Android applications.
+4. **Access Emulators**
+  - noVNC：`http://localhost:6080`
+  - VNC：`localhost:5901`
+  - ADB：`adb connect localhost:5555`
 
 ## Example Docker Compose
 ```yaml
@@ -104,3 +95,7 @@ For any questions or assistance, please contact [helmy419@gmail.com](mailto:helm
 
 **Note:** EmuHub is a project maintained by [Mohamed Helmy]. We strive to improve the testing experience for Android developers and welcome feedback from the community.
 Thank you for using EmuHub!
+## Architecture
+- Single-entry build: root `Dockerfile` builds the runnable image (no separate images required)
+- Resources: `android-docker/` holds SDK scripts, licenses and spoof profiles used by the root build
+- Runtime: Container starts noVNC + Emulator; spoof profiles are injected via `-prop` before AVD creation

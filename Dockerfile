@@ -1,155 +1,43 @@
-FROM mohamedhelmy/android-docker:34
+FROM ubuntu:20.04
 
-MAINTAINER Mohamed Helmy <helmy419@gmail.com>
+LABEL maintainer="emuhub"
 
-###
-# Deskstop/BASE noVNC
-###
-ENV DEBIAN_FRONTEND=noninteractive \
-    TZ=EET \
-    HOME=/root \
-    DISPLAY_WIDTH=1920 \
-    DISPLAY_HEIGHT=1080 \
-    WEB_LISTENING_PORT=5800 \
-    VNC_LISTENING_PORT=5900
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US \
+    LC_ALL=en_US.UTF-8 \
+    DEBIAN_FRONTEND=noninteractive \
+    ANDROID_HOME=/opt/android-sdk-linux \
+    ANDROID_SDK_HOME=/opt/android-sdk-linux \
+    ANDROID_SDK_ROOT=/opt/android-sdk-linux \
+    ANDROID_SDK=/opt/android-sdk-linux \
+    PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/cmdline-tools/tools/bin:${ANDROID_HOME}/tools/bin:${ANDROID_HOME}/build-tools/34.0.0:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/emulator:${ANDROID_HOME}/bin"
 
-RUN apt-get update && \
-    apt-get -yq dist-upgrade && \
-    apt-get install -yq --no-install-recommends \
-    wget \
-    curl \
-    bzip2 \
-    ca-certificates \
-    apt-utils \
-    software-properties-common \
-    openssl \
-    tini \
-    pwgen \
-    sudo \
-    netcat \
-    vim-tiny \
-    net-tools \
-    sed \
-    jq \
-    npm \
-    unzip \
-    python3-pip \
-    xterm \
-    supervisor \
-    socat \
-    x11vnc \
-    openbox \
-    feh \
-    menu \
-    python-numpy \
-    net-tools \
-    ffmpeg \
-    jq \
-    qemu-kvm \
-    libvirt-daemon-system \
-    libvirt-clients\
-    virtinst \
-    virt-manager \
-    bridge-utils \
-    build-essential \
-    iputils-ping \
-    lxde \
-    lxde-common \
-    xterm \
-    xfce4-terminal \
-    firefox \
-    htop \
-    screen
+RUN dpkg --add-architecture i386 \
+    && apt-get update -yqq \
+    && apt-get install -y curl expect git libc6:i386 libgcc1:i386 libncurses5:i386 libstdc++6:i386 zlib1g:i386 openjdk-17-jdk wget unzip vim xvfb fluxbox x11vnc novnc python3-websockify \
+    && apt-get clean \
+    && groupadd android \
+    && useradd -d /opt/android-sdk-linux -g android android
 
+COPY android-docker/android34/tools /opt/tools
+COPY android-docker/android34/licenses /opt/licenses
+COPY android-docker/common/spoof /opt/spoof
 
-# create an emuhub user
-RUN useradd --create-home --shell /bin/bash --user-group emuhub
-RUN echo "emuhub:emuhub" | chpasswd
-RUN usermod -aG libvirt emuhub
-RUN usermod -aG kvm emuhub
-RUN usermod -aG sudo emuhub
-COPY ./user-configuration/images /home/emuhub/images
-COPY ./user-configuration/.config /home/emuhub/.config 
-COPY ./user-configuration/.Xauthority /home/emuhub/.Xauthority
-COPY ./user-configuration/.bashrc /home/emuhub/.bashrc
-RUN touch  /home/emuhub/.sudo_as_admin_successful
+WORKDIR /opt/android-sdk-linux
 
-# create avd 
-COPY emulator-configuration/skins /opt/android-sdk-linux/skins
-COPY emulator-configuration/emulator  /home/emuhub/emulator
-RUN chmod -R +x /home/emuhub/emulator
-RUN chmod -R +777 /home/emuhub/.config
-RUN chmod +777 /home/emuhub/.Xauthority
-COPY ./user-configuration/Desktop /home/emuhub/Desktop
+RUN /opt/tools/entrypoint.sh built-in
 
-# Update Android SDK
-RUN /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager --update && \
-    /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager --install "emulator" && \
-    /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager --install "system-images;android-34;google-tv;x86" && \
-    /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager --install "system-images;android-33;android-wear;x86_64" && \
-    /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager --install "system-images;android-34;google_apis;arm64-v8a"
+RUN /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager "cmdline-tools;latest" \
+    && /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager "build-tools;34.0.0" \
+    && /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager "platform-tools" \
+    && /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager "platforms;android-34" \
+    && /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager "system-images;android-34;google_apis;x86_64"
 
-#     /opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager --install "system-images;android-34;google_apis_playstore;x86_64" && \
+RUN python3 /opt/spoof/gen_profiles.py
 
+EXPOSE 6080 5901 5555
 
-RUN apt-get install -y \
-    tigervnc-standalone-server \
-    tigervnc-xorg-extension 
+ENV SPOOF_PROFILE=pixel_8_pro
 
-ADD config /config
+CMD ["/opt/tools/start-emuhub.sh"]
 
-# Build noVNC
-ARG NOVNC_VERSION=1.4.0
-ARG NOVNC_URL=https://github.com/novnc/noVNC/archive/refs/tags/v${NOVNC_VERSION}.tar.gz
-RUN npm install clean-css-cli -g
-
-# packages websockify will need
-RUN pip3 install \
-    numpy \
-    jwcrypto
-
-# Install noVNC
-RUN mkdir /noVNC && \
-    curl -# -L ${NOVNC_URL} | tar -xz --strip 1 -C /noVNC
-COPY config/index.html /noVNC/index.html
-COPY config/app/imgs /noVNC/app/imgs
-
-WORKDIR /tmp
-# Install websockify
-RUN wget https://github.com/novnc/websockify/archive/refs/tags/v0.11.0.tar.gz -O /tmp/websockify.tgz && \
-    tar -zxf /tmp/websockify.tgz && \
-    rm /tmp/websockify.tgz && \
-    cd /tmp/websockify*  && \
-    python3 setup.py install
-
-# Set version of CSS and JavaScript file URLs
-RUN sed "s/UNIQUE_VERSION/$(date | md5sum | cut -c1-10)/g" -i /noVNC/index.html
-
-EXPOSE 6080
-
-### RDP ###
-RUN apt install -y xrdp 
-RUN touch /var/log/xrdp-sesman.log && touch /var/log/xrdp.log
-RUN chmod +66 /var/log/xrdp-sesman.log 
-RUN chmod +66 /var/log/xrdp.log
-RUN mkdir /var/run/xrdp
-RUN chown xrdp:xrdp /var/run/xrdp
-RUN chmod +777 /var/run/xrdp
-RUN chown emuhub:emuhub -R /etc/xrdp
-
-
-EXPOSE 3350
-EXPOSE 3389
-
-# remove clipit and deluge packages to get rid of more annoying UI stuff 
-RUN apt-get remove -y \
-    clipit \
-    deluge
-
-RUN /config/cleanup-cruft.sh
-### Finish Build
-ADD start-vnc.sh /usr/local/bin/start-vnc.sh
-ENTRYPOINT ["tini", "--"]
-CMD ["/usr/local/bin/start-vnc.sh"]
-
-WORKDIR /home/emuhub
