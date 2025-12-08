@@ -1,9 +1,22 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+
+# OS/editor
+.DS_Store
+*.log
+.vscode/
+.idea/
+
+# Node & frontend build outputs (globally)
+**/node_modules/
+**/.next/
+**/dist/
+**/coverage/
+**/.cache/
+**/build/
+**/tmp/
+
 # dependencies
-**/node_modules
-web/node_modules
-web/.next
 /.pnp
 .pnp.js
 .yarn/install-state.gz

@@ -1,0 +1,26 @@
+# VCS
+.git
+.gitignore
+
+# OS/editor
+.DS_Store
+*.log
+.vscode/
+.idea/
+
+# Node & frontend build outputs (globally)
+**/node_modules/
+**/.next/
+**/dist/
+**/coverage/
+**/.cache/
+**/build/
+**/tmp/
+
+# Keep dependency manifests
+!web/package.json
+!web/package-lock.json
+
+# If you add more workspaces, un-ignore their manifests similarly
+# !packages/*/package.json
+# !packages/*/package-lock.json
