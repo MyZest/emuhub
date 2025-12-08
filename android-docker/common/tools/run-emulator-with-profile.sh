@@ -29,6 +29,10 @@ done < "$PROP_FILE"
 
 EMULATOR_BIN="${ANDROID_HOME}/emulator/emulator"
 ARGS=( -avd "$AVD_NAME" -gpu swiftshader_indirect -no-accel -no-snapshot -no-boot-anim -verbose )
+# Ports: console/adbd
+if [ -n "${EMU_CONSOLE_PORT:-}" ] && [ -n "${EMU_ADB_PORT:-}" ]; then
+  ARGS+=( -ports "${EMU_CONSOLE_PORT},${EMU_ADB_PORT}" )
+fi
 SKIN_DIR="${EMULATOR_SKINS_DIR:-}"
 [ -z "$SKIN_DIR" ] || [ ! -d "$SKIN_DIR" ] && [ -d "/opt/app/emulator-configuration/skins" ] && SKIN_DIR="/opt/app/emulator-configuration/skins"
 [ -z "$SKIN_DIR" ] || [ ! -d "$SKIN_DIR" ] && [ -d "${ANDROID_HOME}/emulator/skins" ] && SKIN_DIR="${ANDROID_HOME}/emulator/skins"

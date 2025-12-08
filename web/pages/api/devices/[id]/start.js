@@ -6,8 +6,7 @@ function sysImg(api) {
 }
 
 export default async function handler(req, res) {
-  const { id } = req.query
-  const did = parseInt(String(id), 10)
+  const did = Date.now()
   const body = req.body || {}
   const api = parseInt(String(body?.api ?? 34), 10)
   function readApisFromAndroidDocker() {
@@ -67,9 +66,53 @@ export default async function handler(req, res) {
   if (vncPass.length < 1 || vncPass.length > 64)
     return res.status(400).json({ ok: false, error: 'invalid vnc_pass length' })
 
-  const display = `:${10 + did}`
-  const vncPort = 5900 + did
-  const wsPort = 6080 + did
+  const adbPort = Number(body?.adb_port || 0)
+  function clamp(n, min, max) {
+    return Math.max(min, Math.min(max, n))
+  }
+  let vncPort, wsPort, display, adb
+  if (Number.isInteger(adbPort) && adbPort >= 1024 && adbPort <= 65535) {
+    vncPort = adbPort + 1
+    wsPort = adbPort + 2
+    const seed = Math.abs(adbPort) % 1000
+    display = `:${10 + seed}`
+    adb = adbPort
+  } else {
+    const seed = did % 1000
+    display = `:${10 + seed}`
+    vncPort = 5900 + seed
+    wsPort = 6080 + seed
+    adb = vncPort - 1
+  }
+
+  const { Socket } = await import('net')
+  async function isPortInUse(port, host = '127.0.0.1', timeout = 300) {
+    return await new Promise((resolve) => {
+      const s = new Socket()
+      let done = false
+      const finish = (inUse) => {
+        if (done) return
+        done = true
+        try {
+          s.destroy()
+        } catch {}
+        resolve(inUse)
+      }
+      s.setTimeout(timeout)
+      s.once('connect', () => finish(true))
+      s.once('timeout', () => finish(false))
+      s.once('error', () => finish(false))
+      try {
+        s.connect(port, host)
+      } catch {
+        finish(false)
+      }
+    })
+  }
+
+  // 校验端口占用
+  if (await isPortInUse(vncPort)) return res.status(409).json({ ok: false, error: 'port in use', port: 'vnc' })
+  if (await isPortInUse(wsPort)) return res.status(409).json({ ok: false, error: 'port in use', port: 'ws' })
 
   const { spawn } = await import('child_process')
   const args = [
@@ -81,7 +124,20 @@ export default async function handler(req, res) {
     profile,
     String(api),
   ]
+  const env = {
+    ...process.env,
+    DISPLAY: display,
+    SPOOF_PROFILE: profile,
+    API: String(api),
+    AVD_NAME: `emu_${did}`,
+    SYS_IMG: sysImg(api),
+  }
+  if (Number.isInteger(adbPort) && adbPort >= 1024 && adbPort <= 65535) {
+    env.EMU_ADB_PORT = String(adbPort)
+    env.EMU_CONSOLE_PORT = String(adbPort - 1)
+  }
   const child = spawn('/opt/tools/start-device-session.sh', args, {
+    env,
     detached: true,
     stdio: 'ignore',
   })
@@ -89,19 +145,10 @@ export default async function handler(req, res) {
     child.unref()
   } catch {}
 
-  const env = {
-    ...process.env,
-    DISPLAY: display,
-    SPOOF_PROFILE: profile,
-    API: String(api),
-    AVD_NAME: `emu_${profile}_api${api}_d${did}`,
-    SYS_IMG: sysImg(api),
-  }
-
   res
     .status(200)
     .json({
       ok: true,
-      device: { id: did, api, profile, vnc: vncPort, ws: wsPort, status: 'starting' },
+      device: { id: did, api, profile, vnc: vncPort, ws: wsPort, adb, status: 'starting' },
     })
 }
