@@ -1,12 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
 import { createSwaggerSpec } from 'next-swagger-doc'
 
-/**
- * API: GET /api/swagger.json
- * - 生成 OpenAPI 规范，扫描 pages/api 下的 @swagger 注释
- *   返回: OpenAPI JSON
- */
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default function handler(req, res) {
   const spec = createSwaggerSpec({
     title: 'EmuHub API',
     version: '1.0.0',

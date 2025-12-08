@@ -1,21 +1,13 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
 import { spawn, spawnSync } from 'child_process'
 
-function sysImg(api: number) {
+function sysImg(api) {
   return `system-images;android-${api};google_apis;x86_64`;
 }
 
-type StartBody = { api?: number; profile?: string; vnc_pass?: string }
-type StartOk = { ok: true; device: { api: number; profile: string; vnc: number; ws: number } }
-type ErrorResp = { ok: false; error: string }
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<StartOk | ErrorResp>
-) {
+export default async function handler(req, res) {
   const { id } = req.query;
   const did = parseInt(String(id), 10);
-  const body = req.body as StartBody
+  const body = req.body || {}
   const api = parseInt(String(body?.api ?? 34), 10);
   const allowedApis = [30,32,34];
   if (!allowedApis.includes(api)) return res.status(400).json({ ok:false, error:'invalid api' });
@@ -47,36 +39,4 @@ export default async function handler(
 
   res.status(200).json({ ok: true, device: { api, profile, vnc: vncPort, ws: wsPort } });
 }
-/**
- * API: POST /api/devices/:id/start
- * - 启动指定设备实例的 Emulator
- *   入参(JSON): { api:number, profile:string, vnc_pass:string }
- *   行为: 确保系统镜像(懒安装) → 启动 Xvfb → x11vnc(密码) → websockify → 以 -prop 注入伪装属性并启动 Emulator
- *   返回: { ok:true, device:{ api, profile, vnc:number, ws:number } }
- * @swagger
- * /api/devices/{id}/start:
- *   post:
- *     summary: 启动设备实例
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               api:
- *                 type: integer
- *               profile:
- *                 type: string
- *               vnc_pass:
- *                 type: string
- *     responses:
- *       200:
- *         description: 启动成功
- */
+

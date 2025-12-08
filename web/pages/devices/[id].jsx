@@ -1,41 +1,41 @@
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 
 export default function Device() {
-  const router = useRouter();
-  const { id } = router.query;
-  const [api, setApi] = useState<string>('34');
-  const [versions, setVersions] = useState<Array<{api:number;installed:boolean}>>([]);
-  const [profile, setProfile] = useState<string>('pixel_8_pro');
-  const [profiles, setProfiles] = useState<string[]>([]);
-  const [vnc, setVnc] = useState<string>('admin');
-  const [status, setStatus] = useState<string>('');
+  const router = useRouter()
+  const { id } = router.query
+  const [api, setApi] = useState('34')
+  const [versions, setVersions] = useState([])
+  const [profile, setProfile] = useState('pixel_8_pro')
+  const [profiles, setProfiles] = useState([])
+  const [vnc, setVnc] = useState('admin')
+  const [status, setStatus] = useState('')
 
   useEffect(() => {
     const load = async () => {
-      const resP = await fetch('/api/profiles');
-      const jsonP = await resP.json();
-      setProfiles(jsonP.profiles || ['pixel_8_pro']);
-      const resV = await fetch('/api/versions');
-      const jsonV = await resV.json();
-      setVersions(jsonV.versions || [{api:34,installed:true}]);
-    };
-    load();
-  }, []);
+      const resP = await fetch('/api/profiles')
+      const jsonP = await resP.json()
+      setProfiles(jsonP.profiles || ['pixel_8_pro'])
+      const resV = await fetch('/api/versions')
+      const jsonV = await resV.json()
+      setVersions(jsonV.versions || [{api:34,installed:true}])
+    }
+    load()
+  }, [])
 
   const start = async () => {
-    if (!id) return;
-    setStatus('Starting...');
+    if (!id) return
+    setStatus('Starting...')
     const res = await fetch(`/api/devices/${id}/start`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ api, profile, vnc_pass: vnc })
-    });
-    const json = await res.json();
-    setStatus('Started');
-    const ws = json.device.ws;
-    window.location.href = `/novnc/vnc.html?path=websockify&port=${ws}`;
-  };
+    })
+    const json = await res.json()
+    setStatus('Started')
+    const ws = json.device.ws
+    window.location.href = `/novnc/vnc.html?path=websockify&port=${ws}`
+  }
 
   return (
     <main style={{fontFamily:'sans-serif',padding:20}}>
@@ -63,5 +63,6 @@ export default function Device() {
       <button onClick={start}>Start</button>
       <div style={{marginTop:12}}>{status}</div>
     </main>
-  );
+  )
 }
+

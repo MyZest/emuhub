@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from 'next/link'
 export default function Home() {
   return (
     <main style={{fontFamily:'sans-serif',padding:20}}>
@@ -9,6 +9,6 @@ export default function Home() {
         <li><Link href="/devices/3">Device 3</Link></li>
       </ul>
     </main>
-  );
+  )
 }
 
