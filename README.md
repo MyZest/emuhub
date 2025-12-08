@@ -106,3 +106,8 @@ Thank you for using EmuHub!
   - 列表：`GET /api/profiles`
   - 上传：`POST /api/profiles`（JSON：`{ name, content }`）
   - 删除：`DELETE /api/profiles/<name>`
+## Device Logos
+- 放置路径（两种都支持，名字与机型一致，例如 `pixel_8_pro.png` 或 `.svg`）：
+  - 动态：`/data/spoof/profiles/<name>.png|.svg`（运行容器时挂载 `-v $(pwd)/profiles:/data/spoof/profiles`）
+  - 内置：`/opt/spoof/profiles/<name>.png|.svg`
+- 前端会自动在机型列表中显示对应 logo；无 logo 显示占位文本。

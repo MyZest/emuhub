@@ -26,12 +26,23 @@ function validLine(line) {
   return allowed.some(p=>k.startsWith(p))
 }
 
+function hasLogo(name) {
+  const cands = [
+    `/data/spoof/profiles/${name}.png`,
+    `/data/spoof/profiles/${name}.svg`,
+    `/opt/spoof/profiles/${name}.png`,
+    `/opt/spoof/profiles/${name}.svg`
+  ]
+  return cands.some(p => fs.existsSync(p))
+}
+
 export default async function handler(req, res) {
   if (req.method === 'GET') {
     const builtins = listProps('/opt/spoof/profiles')
     const dynamics = listProps('/data/spoof/profiles')
-    const set = new Set([...builtins, ...dynamics])
-    return res.status(200).json({ profiles: Array.from(set) })
+    const set = Array.from(new Set([...builtins, ...dynamics]))
+    const items = set.map(name => ({ name, hasLogo: hasLogo(name) }))
+    return res.status(200).json({ profiles: items })
   }
   if (req.method === 'POST') {
     const body = req.body || {}
@@ -50,4 +61,3 @@ export default async function handler(req, res) {
   }
   return res.status(405).json({ ok:false, error: 'method not allowed' })
 }
-
