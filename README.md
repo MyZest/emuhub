@@ -115,4 +115,4 @@ Thank you for using EmuHub!
 
 
 docker build --platform linux/amd64 -t emuhub:0.1.1 .
-docker run --platform linux/amd64 -it --rm -p 8080:8080 -p 6080-6090:6080-6090 -p 5900-5910:5900-5910 -p 5555:5555 --name emuhub emuhub:0.1.1
+docker run --platform linux/amd64 -it --rm -p 8080:8080 -p 6080-6090:6080-6090 -p 5900-5910:5900-5910 -p 5555:5555 --name emuhub emuhub:0.1.2
