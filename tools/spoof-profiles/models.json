@@ -1,0 +1,59 @@
+{
+  "pixel_8_pro": {
+    "manufacturer": "Google",
+    "brand": "google",
+    "model": "Pixel 8 Pro",
+    "name": "pixel_8_pro",
+    "device": "pixel_8_pro",
+    "build_type": "user",
+    "build_tags": "release-keys",
+    "build_flavor": "pixel_8_pro-user",
+    "fingerprint_system": "google/pixel_8_pro/pixel_8_pro:14/UQ1A.240905.001/1234567:user/release-keys",
+    "fingerprint_vendor": "google/pixel_8_pro/pixel_8_pro:14/UQ1A.240905.001/1234567:user/release-keys",
+    "fingerprint_bootimage": "google/pixel_8_pro/pixel_8_pro:14/UQ1A.240905.001/1234567:user/release-keys",
+    "vendor_security_patch": "2024-09-05"
+  },
+  "pixel_7": {
+    "manufacturer": "Google",
+    "brand": "google",
+    "model": "Pixel 7",
+    "name": "pixel_7",
+    "device": "pixel_7",
+    "build_type": "user",
+    "build_tags": "release-keys",
+    "build_flavor": "pixel_7-user",
+    "fingerprint_system": "google/pixel_7/pixel_7:14/UQ1A.240905.001/1234567:user/release-keys",
+    "fingerprint_vendor": "google/pixel_7/pixel_7:14/UQ1A.240905.001/1234567:user/release-keys",
+    "fingerprint_bootimage": "google/pixel_7/pixel_7:14/UQ1A.240905.001/1234567:user/release-keys",
+    "vendor_security_patch": "2024-09-05"
+  },
+  "pixel_6a": {
+    "manufacturer": "Google",
+    "brand": "google",
+    "model": "Pixel 6a",
+    "name": "pixel_6a",
+    "device": "pixel_6a",
+    "build_type": "user",
+    "build_tags": "release-keys",
+    "build_flavor": "pixel_6a-user",
+    "fingerprint_system": "google/pixel_6a/pixel_6a:13/TQ3A.230901.001/1234567:user/release-keys",
+    "fingerprint_vendor": "google/pixel_6a/pixel_6a:13/TQ3A.230901.001/1234567:user/release-keys",
+    "fingerprint_bootimage": "google/pixel_6a/pixel_6a:13/TQ3A.230901.001/1234567:user/release-keys",
+    "vendor_security_patch": "2023-09-05"
+  },
+  "pixel_fold": {
+    "manufacturer": "Google",
+    "brand": "google",
+    "model": "Pixel Fold",
+    "name": "pixel_fold",
+    "device": "pixel_fold",
+    "build_type": "user",
+    "build_tags": "release-keys",
+    "build_flavor": "pixel_fold-user",
+    "fingerprint_system": "google/pixel_fold/pixel_fold:14/UQ1A.240905.001/1234567:user/release-keys",
+    "fingerprint_vendor": "google/pixel_fold/pixel_fold:14/UQ1A.240905.001/1234567:user/release-keys",
+    "fingerprint_bootimage": "google/pixel_fold/pixel_fold:14/UQ1A.240905.001/1234567:user/release-keys",
+    "vendor_security_patch": "2024-09-05"
+  }
+}
+
