@@ -40,7 +40,7 @@ RUN --mount=type=cache,target=/var/cache/apt --mount=type=cache,target=/var/lib/
     groupadd android; \
     useradd -d /opt/android-sdk-linux -g android android
 
-COPY android-docker/android34/tools /opt/tools
+COPY android-docker/common/tools /opt/tools
 COPY android-docker/android34/licenses /opt/licenses
 COPY android-docker/common/spoof /opt/spoof
 COPY web /opt/app

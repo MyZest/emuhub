@@ -7,7 +7,7 @@ PROP_FILE="/opt/spoof/profiles/${PROFILE}.props"
 if [ ! -f "$PROP_FILE" ]; then
   echo "profile not found: $PROFILE ($PROP_FILE)" >&2
   exit 1
-fi
+}
 
 AVD_NAME=${AVD_NAME:-emu_${PROFILE}_api34}
 SYS_IMG="${SYS_IMG:-system-images;android-${API:-34};google_apis;x86_64}"

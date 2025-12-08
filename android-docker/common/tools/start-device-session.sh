@@ -21,12 +21,10 @@ export API="$API"
 export AVD_NAME
 export SYS_IMG
 
-# Ensure Android env in PATH if available
 if [ -f "/opt/android-sdk-linux/bin/android-env.sh" ]; then
   source "/opt/android-sdk-linux/bin/android-env.sh"
 fi
 
-# Logs directory per session
 LOG_DIR="/var/log/emuhub/d${DID}"
 mkdir -p "$LOG_DIR"
 LOCK_FILE="/tmp/emu_session_${DID}.lock"
@@ -36,7 +34,6 @@ else
   echo $$ > "$LOCK_FILE"
 fi
 
-# Ensure required system image only if missing
 SYS_DIR="/opt/android-sdk-linux/system-images/android-${API}/google_apis/x86_64"
 SDK_BIN="/opt/android-sdk-linux/cmdline-tools/tools/bin/sdkmanager"
 if [ ! -d "$SYS_DIR" ]; then
@@ -47,18 +44,16 @@ if [ ! -d "$SYS_DIR" ]; then
   fi
 fi
 
-# Start Xvfb (idempotent)
 if ! pgrep -f "Xvfb .*${DISPLAY}" >/dev/null 2>&1; then
   nohup Xvfb "$DISPLAY" -screen 0 "$EMU_RES" >"${LOG_DIR}/xvfb.log" 2>&1 &
 fi
 
-# VNC password file
 PASSWD_FILE="/tmp/vnc_pass_${DID}"
 bash -lc "x11vnc -storepasswd \"${VNC_PASS}\" ${PASSWD_FILE}" >/dev/null 2>&1 || true
 
 choose_free_port() {
   local base=$1
-  local limit=${2:-100}
+  local limit=${2:-200}
   local p=$base
   local i=0
   while [ $i -lt $limit ]; do
@@ -89,12 +84,10 @@ if ! pgrep -f "websockify .* ${WS_PORT} .*${VNC_PORT}" >/dev/null 2>&1; then
   nohup websockify "$WS_PORT" "localhost:${VNC_PORT}" >"${LOG_DIR}/websockify.log" 2>&1 &
 fi
 
-# Start emulator with profile (background, idempotent best-effort)
 if ! pgrep -f "emulator.*-avd ${AVD_NAME}" >/dev/null 2>&1; then
   nohup /opt/tools/run-emulator-with-profile.sh >"${LOG_DIR}/emulator.log" 2>&1 &
 fi
 
-# Optional readiness check in background
 if [ "$WAIT_READY" = "true" ]; then
   nohup /opt/tools/android-wait-for-emulator.sh >"${LOG_DIR}/emulator_ready.log" 2>&1 &
 fi
