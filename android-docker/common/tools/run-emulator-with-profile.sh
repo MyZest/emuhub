@@ -12,7 +12,26 @@ fi
 AVD_NAME=${AVD_NAME:-emu_${PROFILE}_api34}
 SYS_IMG="${SYS_IMG:-system-images;android-${API:-34};google_apis;x86_64}"
 
-source /opt/android-sdk-linux/bin/android-env.sh
+# Bootstrap Android SDK if needed
+ENV_SCRIPT="/opt/android-sdk-linux/bin/android-env.sh"
+if [ ! -f "$ENV_SCRIPT" ]; then
+  if [ -f "/opt/tools/android-env.sh" ]; then
+    ENV_SCRIPT="/opt/tools/android-env.sh"
+  fi
+fi
+if [ -f "$ENV_SCRIPT" ]; then
+  source "$ENV_SCRIPT"
+fi
+
+if ! command -v avdmanager >/dev/null 2>&1 || [ ! -x "${ANDROID_HOME}/emulator/emulator" ]; then
+  if [ -x "/opt/tools/android-sdk-update.sh" ]; then
+    /opt/tools/android-sdk-update.sh built-in
+    [ -f "/opt/android-sdk-linux/bin/android-env.sh" ] && source "/opt/android-sdk-linux/bin/android-env.sh"
+  else
+    echo "Android SDK tools not installed and installer missing" >&2
+    exit 2
+  fi
+fi
 
 # Create AVD if not exists
 if ! avdmanager list avd | grep -q "name: $AVD_NAME"; then
@@ -28,6 +47,8 @@ while IFS='=' read -r k v; do
 done < "$PROP_FILE"
 
 EMULATOR_BIN="${ANDROID_HOME}/emulator/emulator"
+[ -x "$EMULATOR_BIN" ] || EMULATOR_BIN="$(command -v emulator || true)"
+[ -x "$EMULATOR_BIN" ] || { echo "emulator binary not found under ${ANDROID_HOME} or PATH" >&2; exit 3; }
 ARGS=( -avd "$AVD_NAME" -gpu swiftshader_indirect -no-accel -no-snapshot -no-boot-anim -verbose )
 # Ports: console/adbd
 if [ -n "${EMU_CONSOLE_PORT:-}" ] && [ -n "${EMU_ADB_PORT:-}" ]; then
