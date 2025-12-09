@@ -5,7 +5,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY web/package*.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci
 COPY web ./
-# RUN rm -rf .next
+RUN rm -rf .next
 RUN npm run build
 
 FROM ubuntu:20.04
@@ -56,13 +56,14 @@ COPY android-docker/common/spoof /opt/spoof
 
 
 RUN mkdir -p /opt/android-docker
-COPY android-docker/android28 /opt/android-docker/android28
-COPY android-docker/android29 /opt/android-docker/android29
-COPY android-docker/android30 /opt/android-docker/android30
-COPY android-docker/android31 /opt/android-docker/android31
-COPY android-docker/android32 /opt/android-docker/android32
-COPY android-docker/android33 /opt/android-docker/android33
-COPY android-docker/android34 /opt/android-docker/android34
+COPY android-docker /opt/android-docker/
+# COPY android-docker/android28 /opt/android-docker/android28
+# COPY android-docker/android29 /opt/android-docker/android29
+# COPY android-docker/android30 /opt/android-docker/android30
+# COPY android-docker/android31 /opt/android-docker/android31
+# COPY android-docker/android32 /opt/android-docker/android32
+# COPY android-docker/android33 /opt/android-docker/android33
+# COPY android-docker/android34 /opt/android-docker/android34
 
 
 RUN find /opt/tools -type f -name "*.sh" -exec chmod +x {} \;

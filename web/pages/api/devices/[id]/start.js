@@ -130,10 +130,8 @@ export default async function handler(req, res) {
     AVD_NAME: `emu_${did}`,
     SYS_IMG: sysImg(api),
   }
-  if (Number.isInteger(adbPort) && adbPort >= 1024 && adbPort <= 65535) {
-    env.EMU_ADB_PORT = String(adbPort)
-    env.EMU_CONSOLE_PORT = String(adbPort - 1)
-  }
+  env.EMU_ADB_PORT = String(adb)
+  env.EMU_CONSOLE_PORT = String(adb - 1)
   const child = spawn('/opt/tools/start-device-session.sh', args, {
     env,
     detached: true,

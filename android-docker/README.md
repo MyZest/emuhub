@@ -11,3 +11,25 @@ docker build --platform linux/amd64 -t emuhub:0.1.0 .
 docker run --platform linux/amd64 -it --rm -p 6080:6080 -p 5901:5901 -p 5555:5555 -e SPOOF_PROFILE=pixel_8_pro --name emuhub emuhub:0.1.0
 ```
 
+## Multi-device ports and scrcpy
+
+- Port triplet convention: `ADB=P`, `VNC=P+1`, `WS=P+2`.
+- Run multiple devices by pre-mapping ranges, then choose free triplets per session:
+  - `docker run ... -p 5555-5599:5555-5599 -p 5900-5999:5900-5999 -p 6080-6199:6080-6199 ...`
+- Connect from host:
+  - `adb connect 127.0.0.1:P`
+  - `scrcpy -s 127.0.0.1:P`
+
+Compose example:
+
+```
+services:
+  emuhub:
+    image: emuhub:0.1.0
+    ports:
+      - "5555-5599:5555-5599"
+      - "5900-5999:5900-5999"
+      - "6080-6199:6080-6199"
+    environment:
+      - SPOOF_PROFILE=pixel_8_pro
+```
