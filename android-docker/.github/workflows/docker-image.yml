@@ -1,0 +1,88 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the repo
+      uses: actions/checkout@v2
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push android 34
+      uses: docker/build-push-action@v2
+      with:
+        context: ./android34
+        file: ./android34/Dockerfile
+        push: true
+        tags: mohamedhelmy/android-docker:34
+
+    - name: Build and push android 33
+      uses: docker/build-push-action@v2
+      with:
+        context: ./android33
+        file: ./android33/Dockerfile
+        push: true
+        tags: mohamedhelmy/android-docker:33
+
+    - name: Build and push android 32
+      uses: docker/build-push-action@v2
+      with:
+        context: ./android32
+        file: ./android32/Dockerfile
+        push: true
+        tags: mohamedhelmy/android-docker:32
+
+
+    - name: Build and push android 31
+      uses: docker/build-push-action@v2
+      with:
+        context: ./android31
+        file: ./android31/Dockerfile
+        push: true
+        tags: mohamedhelmy/android-docker:31
+
+
+    - name: Build and push android 30
+      uses: docker/build-push-action@v2
+      with:
+        context: ./android30
+        file: ./android30/Dockerfile
+        push: true
+        tags: mohamedhelmy/android-docker:30
+
+    - name: Build and push android 29
+      uses: docker/build-push-action@v2
+      with:
+        context: ./android29
+        file: ./android29/Dockerfile
+        push: true
+        tags: mohamedhelmy/android-docker:29
+
+    - name: Build and push android 28
+      uses: docker/build-push-action@v2
+      with:
+        context: ./android28
+        file: ./android28/Dockerfile
+        push: true
+        tags: mohamedhelmy/android-docker:28
